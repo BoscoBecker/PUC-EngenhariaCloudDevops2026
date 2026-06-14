@@ -25,7 +25,16 @@ Este projeto apresenta um exemplo simples de aplicação web em Flask, com persi
    ```bash
    python src/app.py
    ```
-3. Execute os testes:
+   ```bash
+   flask run  
+   ```
+3. Execute a aplicação com Debug:
+   ```bash
+   cd /src
+   flask run  --debug
+   ```
+
+4. Execute os testes:
    ```bash
    pytest
    ```
