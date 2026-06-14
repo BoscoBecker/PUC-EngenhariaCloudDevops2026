@@ -1,34 +1,175 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Books</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .table-container {
+            background: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.08);
+            padding: 1.25rem;
+        }
+        .search-input {
+            max-width: 360px;
+        }
+        .pagination li a {
+            min-width: 44px;
+            text-align: center;
+        }
+        .no-results {
+            font-style: italic;
+        }
+    </style>
 </head>
 <body>
+    <div class="container py-5">
+        <div class="row mb-4">
+            <div class="col-12 col-md-8">
+                <h1 class="mb-0">Books</h1>
+                <p class="text-muted">Use a pesquisa e a paginação para localizar seus livros.</p>
+            </div>
+            <div class="col-12 col-md-4 text-md-end align-self-center">
+                <a href="/" class="btn btn-outline-secondary">Voltar</a>
+            </div>
+        </div>
 
-    <h1>Books</h1>
+        <div class="table-container">
+            <div class="row mb-3 align-items-center">
+                <div class="col-12 col-md-6 mb-2 mb-md-0">
+                    <div class="input-group search-input">
+                        <span class="input-group-text">Pesquisar</span>
+                        <input id="searchInput" type="search" class="form-control" placeholder="Digite título, autor, ISSN...">
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 text-md-end">
+                    <small id="tableInfo" class="text-muted"></small>
+                </div>
+            </div>
 
-    <table border="1">
-        <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>Author</th>
-            <th>ISSN</th>
-            <th>Published</th>
-            <th>Pages</th>
-        </tr>
+            <div class="table-responsive">
+                <table id="booksTable" class="table table-hover table-bordered align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Título</th>
+                            <th scope="col">Autor</th>
+                            <th scope="col">ISSN</th>
+                            <th scope="col">Publicado</th>
+                            <th scope="col">Páginas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for book in books %}
+                        <tr>
+                            <td>{{ book.id }}</td>
+                            <td>{{ book.title }}</td>
+                            <td>{{ book.author }}</td>
+                            <td>{{ book.issn }}</td>
+                            <td>{{ book.date_published }}</td>
+                            <td>{{ book.pages }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
-        {% for book in books %}
-        <tr>
-            <td>{{ book.id }}</td>
-            <td>{{ book.title }}</td>
-            <td>{{ book.author }}</td>
-            <td>{{ book.issn }}</td>
-            <td>{{ book.date_published }}</td>
-            <td>{{ book.pages }}</td>
-        </tr>
-        {% endfor %}
+            <div class="row mt-3">
+                <div class="col-12 d-flex justify-content-center">
+                    <nav aria-label="Paginação da tabela">
+                        <ul class="pagination" id="pagination"></ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    </table>
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const pagination = document.getElementById('pagination');
+        const tableInfo = document.getElementById('tableInfo');
+        const rows = Array.from(document.querySelectorAll('#booksTable tbody tr'));
+        const pageSize = 5;
+        let currentPage = 1;
+        let filteredRows = rows.slice();
 
+        function renderTable() {
+            filteredRows = rows.filter(row => {
+                const text = row.textContent.toLowerCase();
+                const query = searchInput.value.trim().toLowerCase();
+                return text.includes(query);
+            });
+
+            const totalRows = filteredRows.length;
+            const totalPages = Math.max(1, Math.ceil(totalRows / pageSize));
+            currentPage = Math.min(currentPage, totalPages);
+            const startIndex = (currentPage - 1) * pageSize;
+            const endIndex = startIndex + pageSize;
+
+            rows.forEach(row => row.style.display = 'none');
+            filteredRows.slice(startIndex, endIndex).forEach(row => row.style.display = 'table-row');
+
+            if (totalRows === 0) {
+                const tbody = document.querySelector('#booksTable tbody');
+                const noResultsRow = document.createElement('tr');
+                noResultsRow.classList.add('no-results');
+                noResultsRow.innerHTML = '<td colspan="6" class="text-center text-muted py-4">Nenhum livro encontrado.</td>';
+                tbody.appendChild(noResultsRow);
+            } else {
+                const existingNoResults = document.querySelector('#booksTable tbody tr.no-results');
+                if (existingNoResults) existingNoResults.remove();
+            }
+
+            renderPagination(totalPages);
+            updateInfo(totalRows, startIndex + 1, Math.min(endIndex, totalRows));
+        }
+
+        function renderPagination(totalPages) {
+            pagination.innerHTML = '';
+            if (totalPages <= 1) return;
+
+            const createPageItem = (page, label, active = false, disabled = false) => {
+                const li = document.createElement('li');
+                li.className = 'page-item' + (active ? ' active' : '') + (disabled ? ' disabled' : '');
+                const a = document.createElement('a');
+                a.className = 'page-link';
+                a.href = '#';
+                a.textContent = label;
+                a.addEventListener('click', event => {
+                    event.preventDefault();
+                    if (disabled || currentPage === page) return;
+                    currentPage = page;
+                    renderTable();
+                });
+                li.appendChild(a);
+                return li;
+            };
+
+            pagination.appendChild(createPageItem(currentPage - 1, 'Anterior', false, currentPage === 1));
+            for (let page = 1; page <= totalPages; page += 1) {
+                pagination.appendChild(createPageItem(page, page, page === currentPage));
+            }
+            pagination.appendChild(createPageItem(currentPage + 1, 'Próximo', false, currentPage === totalPages));
+        }
+
+        function updateInfo(totalRows, start, end) {
+            const text = totalRows === 0
+                ? 'Nenhum registro para exibir.'
+                : `Mostrando ${start}-${end} de ${totalRows} livros`;
+            tableInfo.textContent = text;
+        }
+
+        searchInput.addEventListener('input', () => {
+            currentPage = 1;
+            renderTable();
+        });
+
+        document.addEventListener('DOMContentLoaded', renderTable);
+    </script>
 </body>
 </html>

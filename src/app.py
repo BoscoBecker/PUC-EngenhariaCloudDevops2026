@@ -24,11 +24,25 @@ def index():
 @APP.route("/books", methods=["GET","POST"])    
 def books():    
     if request.method == "GET": 
-        booksReads = DB.session.query(books).all()
+        booksReads = DB.session.execute(text("SELECT * FROM books")).fetchall()
         return render_template('books.html', books=booksReads)
     elif request.method == "POST":
-        # Handle book creation
-        pass
+        title = request.form['title']
+        author = request.form['author']
+        issn = request.form['issn']
+        date_published = request.form['date_published']
+        pages = request.form['pages']
+
+        book = Book(
+            title=title,
+            author=author,
+            issn=issn,
+            date_published=date_published,
+            pages=pages
+        )
+        DB.session.add(book)
+        DB.session.commit()
+        return render_template('books.html', books=DB.session.execute(text("SELECT * FROM books")).fetchall())
 
 
 if __name__ == '__main__':
@@ -47,19 +61,19 @@ if __name__ == '__main__':
                 pages INTEGER NOT NULL
                 )"""))
         DB.session.commit()
-        # try:
-        #     book1 = Book(
-        #         title="The Great Gatsby",
-        #         author="F. Scott Fitzgerald",
-        #         issn="1234567890",
-        #         date_published=date(1925, 4, 10),
-        #         pages=218
-        #     )
-        #     DB.session.add(book1)
-        #     DB.session.commit()
-        #     print("Book inserted successfully")
-        # except Exception as e:
-        #     print(f"Error adding book: {e}")          
+        try:
+            book1 = Book(
+                title="Fundamentos da Arquitetura de Software ",
+                author="Mark Richards(O'Reilly)",
+                issn="8575229680",
+                date_published=date(2020, 1, 10),
+                pages=432
+            )
+            DB.session.add(book1)
+            DB.session.commit()
+            print("Book inserted successfully")
+        except Exception as e:
+            print(f"Error adding book: {e}")          
 
 
     
