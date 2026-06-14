@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Books</title>
+</head>
+<body>
+
+    <h1>Books</h1>
+
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>ISSN</th>
+            <th>Published</th>
+            <th>Pages</th>
+        </tr>
+
+        {% for book in books %}
+        <tr>
+            <td>{{ book.id }}</td>
+            <td>{{ book.title }}</td>
+            <td>{{ book.author }}</td>
+            <td>{{ book.issn }}</td>
+            <td>{{ book.date_published }}</td>
+            <td>{{ book.pages }}</td>
+        </tr>
+        {% endfor %}
+
+    </table>
+
+</body>
+</html>
