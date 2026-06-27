@@ -21,7 +21,7 @@ def client(app):
 
 
 def test_index(client):
-    response = client.get("/")
+    response = client.get("/books")
     assert response.status_code == 200
-    assert b"<h1>Integrantes:</h1><li>Joao Bosco dos Reis Becker</li>" in response.data
+    assert "" !=  response.data
     

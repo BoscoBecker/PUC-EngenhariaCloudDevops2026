@@ -13,9 +13,10 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
-      - name: Listagem de conteudos
-        run: ls -la
-        
+      - name: Instalando dependencias
+        run: pip install -r requirements.txt
+      - name: Executando testes
+        run: pytest -v --disable-warnings --maxfail=1
         
   # estagio01:
   #   runs-on: ubuntu-latest
