@@ -9,3 +9,13 @@ jobs:
     steps:
       - name: Olá mundo!
         run: echo "Olá, mundo!, Github Actions!"
+  estagio02:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "sleep"
+        run: sleep 5
+  estagio03:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "sleep"
+        run: sleep 2      
