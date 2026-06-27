@@ -2,24 +2,37 @@ name: "Pipeline CI/CD Workflow"
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
-  estagio01:
+
+  integracao-continua:
     runs-on: ubuntu-latest
     steps:
-      - name: Olá mundo!
-        run: echo "Olá, mundo!, Github Actions!"
-      - name: "sleep"
-        run: echo "echo estagio01"  
-  estagio02:
-    needs: estagio01
-    runs-on: ubuntu-latest
-    steps:
-      - name: "sleep"
-        run: sleep 5
-  estagio03:
-    needs: estagio02
-    runs-on: ubuntu-latest
-    steps:
-      - name: "sleep"
-        run: sleep 2      
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: Listagem de conteudos
+        run: ls -la
+        
+        
+  # estagio01:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Olá mundo!
+  #       run: echo "Olá, mundo!, Github Actions!"
+  #     - name: "sleep"
+  #       run: echo "echo estagio01"  
+  # estagio02:
+  #   needs: estagio01
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: "sleep"
+  #       run: sleep 5
+  # estagio03:
+  #   needs: estagio02
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: "sleep"
+  #       run: sleep 2      
