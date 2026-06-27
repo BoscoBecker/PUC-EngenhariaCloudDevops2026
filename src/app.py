@@ -47,17 +47,17 @@ if __name__ == '__main__':
     with APP.app_context():
         DB.create_all()
         
-        print("Database created successfully.")
-        DB.session.execute(text("""
-            CREATE TABLE IF NOT EXISTS books (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                title VARCHAR(256) NOT NULL,
-                author VARCHAR(256) NOT NULL,
-                issn VARCHAR(16) NOT NULL,
-                date_published DATETIME NOT NULL,
-                pages INTEGER NOT NULL
-                )"""))
-        DB.session.commit()
+        # print("Database created successfully.")
+        # DB.session.execute(text("""
+        #     CREATE TABLE IF NOT EXISTS books (
+        #         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        #         title VARCHAR(256) NOT NULL,
+        #         author VARCHAR(256) NOT NULL,
+        #         issn VARCHAR(16) NOT NULL,
+        #         date_published DATETIME NOT NULL,
+        #         pages INTEGER NOT NULL
+        #         )"""))
+        # DB.session.commit()
         try:
             book1 = Book(
                 title="Fundamentos da Arquitetura de Software ",
