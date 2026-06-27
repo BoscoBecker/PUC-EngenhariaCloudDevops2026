@@ -17,11 +17,11 @@ jobs:
         uses: actions/checkout@v4
       - name: Instalando dependencias
         run: pip install -r requirements.txt
-      # - name: migrar banco de dados
-      #   run: |
-      #     flask db init 
-      #     flask db migrate -m "Initial migration."
-      #     flask db upgrade         
+      - name: migrar banco de dados
+        run: |
+          flask db init 
+          flask db migrate -m "Initial migration."
+          flask db upgrade         
       - name: Executando testes
         run: pytest -v --disable-warnings --maxfail=1
   entrega-continuada:
