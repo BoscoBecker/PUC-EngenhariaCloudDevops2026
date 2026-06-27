@@ -5,7 +5,7 @@ on:
 
 jobs:
   estagio01:
-  run-on: ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Olá mundo!
         run: echo "Olá, mundo!, Github Actions!"
