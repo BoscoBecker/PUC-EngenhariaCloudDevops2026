@@ -1,10 +1,11 @@
 from datetime import date
 
 from flask import Flask, render_template, request
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import DateTime, create_engine, text
 from sqlalchemy.orm import DeclarativeBase, Mapped
 from sqlalchemy import Column, Integer, String
-from flask_sqlalchemy import SQLAlchemy
 
 
 class BaseModel(DeclarativeBase): pass
@@ -15,7 +16,7 @@ APP = Flask(__name__)
 APP.config['SQLALCHEMY_DATABASE_URI'] = PATH_DB
 APP.config['SQLALCHEMY_ECHO'] = True
 DB.init_app(APP)
-
+migrate = Migrate(APP, DB)
 
 @APP.route("/")
 def index():
