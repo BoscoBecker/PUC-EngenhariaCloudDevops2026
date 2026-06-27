@@ -2,16 +2,13 @@ from datetime import date
 
 from flask import Flask, render_template, request
 from flask_migrate import Migrate
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import DateTime, create_engine, text
-from sqlalchemy.orm import DeclarativeBase, Mapped
+from sqlalchemy import text
+from sqlalchemy.orm import Mapped
 from sqlalchemy import Column, Integer, String
+from db import DB
+from Entities.book import Book
 
-
-class BaseModel(DeclarativeBase): pass
-
-PATH_DB ='sqlite:///books.db'
-DB = SQLAlchemy(model_class=BaseModel)
+PATH_DB = 'sqlite:///books.db'
 APP = Flask(__name__)
 APP.config['SQLALCHEMY_DATABASE_URI'] = PATH_DB
 APP.config['SQLALCHEMY_ECHO'] = True
@@ -25,7 +22,7 @@ def index():
 @APP.route("/books", methods=["GET","POST"])    
 def books():    
     if request.method == "GET": 
-        booksReads = DB.session.execute(text("SELECT * FROM books")).fetchall()
+        booksReads = booksReads = DB.session.query(Book).all()
         return render_template('books.html', books=booksReads)
     elif request.method == "POST":
         title = request.form['title']
@@ -43,14 +40,13 @@ def books():
         )
         DB.session.add(book)
         DB.session.commit()
-        return render_template('books.html', books=DB.session.execute(text("SELECT * FROM books")).fetchall())
+        return render_template('books.html', booksReads = DB.session.query(Book).all())
 
 
 if __name__ == '__main__':
     with APP.app_context():
         DB.create_all()
         
-        from Entities.book import Book
         print("Database created successfully.")
         DB.session.execute(text("""
             CREATE TABLE IF NOT EXISTS books (

@@ -21,25 +21,7 @@ jobs:
         run: |
           flask db init 
           flask db migrate -m "Initial migration."
-          flask db upgrade
-      - name: Debug database
-        run: |
-          pwd
-          find . -name "*.db"
-          python - <<'PY'
-          import sqlite3
-          import os
-
-          for root, dirs, files in os.walk("."):
-              for f in files:
-                  if f.endswith(".db"):
-                      path = os.path.join(root, f)
-                      print(f"\nBanco: {path}")
-                      con = sqlite3.connect(path)
-                      cur = con.cursor()
-                      cur.execute("SELECT name FROM sqlite_master WHERE type='table'")
-                      print(cur.fetchall())
-                      con.close()          
+          flask db upgrade         
       - name: Executando testes
         run: pytest -v --disable-warnings --maxfail=1
 

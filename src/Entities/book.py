@@ -1,6 +1,6 @@
-from sqlalchemy.orm import DeclarativeBase, Mapped
+from sqlalchemy.orm import Mapped
 from sqlalchemy import Column, Integer, String, DateTime
-from app import BaseModel, DB
+from db import BaseModel
 
 
 class Book(BaseModel):
