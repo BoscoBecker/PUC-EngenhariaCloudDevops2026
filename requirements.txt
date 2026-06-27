@@ -1,4 +1,6 @@
 flask
+flask-sqlalchemy
+flask-Migrate
 pytest
 sqlalchemy
-flask-sqlalchemy
+
