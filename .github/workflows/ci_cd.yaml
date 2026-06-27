@@ -22,8 +22,6 @@ jobs:
           flask db init 
           flask db migrate -m "Initial migration."
           flask db upgrade
-      - name: Executando testes
-        run: pytest -v --disable-warnings --maxfail=1
       - name: Debug database
         run: |
           pwd
@@ -41,7 +39,10 @@ jobs:
                       cur = con.cursor()
                       cur.execute("SELECT name FROM sqlite_master WHERE type='table'")
                       print(cur.fetchall())
-                      con.close()
+                      con.close()          
+      - name: Executando testes
+        run: pytest -v --disable-warnings --maxfail=1
+
                     
         
   # estagio01:
