@@ -1,6 +1,6 @@
 from datetime import date
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 from flask_migrate import Migrate
 from sqlalchemy import text
 from sqlalchemy.orm import Mapped
@@ -19,17 +19,20 @@ migrate = Migrate(APP, DB)
 def index():
     return render_template('index.html')
 
-@APP.route("/books", methods=["GET","POST"])    
-def books():    
-    if request.method == "GET": 
-        booksReads = booksReads = DB.session.query(Book).all()
-        return render_template('books.html', books=booksReads)
-    elif request.method == "POST":
+@APP.route("/create", methods=["GET", "POST"])
+def create():
+    if request.method == "GET":
+        return render_template('create.html')
+
+    if request.method == "POST":
         title = request.form['title']
         author = request.form['author']
         issn = request.form['issn']
-        date_published = request.form['date_published']
+        date_published_str = request.form['date_published']
         pages = request.form['pages']
+
+        # Convert string date to date object
+        date_published = date.fromisoformat(date_published_str)
 
         book = Book(
             title=title,
@@ -40,7 +43,22 @@ def books():
         )
         DB.session.add(book)
         DB.session.commit()
-        return render_template('books.html', booksReads = DB.session.query(Book).all())
+        return redirect('/books')
+
+
+@APP.route("/books", methods=["GET"])
+def books():
+    booksReads = DB.session.query(Book).all()
+    return render_template('books.html', books=booksReads)
+
+
+@APP.route("/delete/<int:book_id>", methods=["POST"])
+def delete_book(book_id):
+    book = DB.session.query(Book).filter(Book.id == book_id).first()
+    if book:
+        DB.session.delete(book)
+        DB.session.commit()
+    return redirect('/books')
 
 
 if __name__ == '__main__':
