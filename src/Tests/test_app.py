@@ -1,6 +1,7 @@
 import pytest
 import sys
 import os
+from werkzeug.security import generate_password_hash
 
 sys.path.append(
     os.path.abspath(
@@ -10,6 +11,29 @@ sys.path.append(
 
 from app import APP, DB
 from Entities.book import Book
+from Entities.users import User  
+
+@pytest.fixture
+def authenticated_client(client, app):
+    with app.app_context():
+        user = DB.session.query(User).filter_by(username="teste").first()
+
+        if user is None:
+            user = User(
+                username="teste",
+                password=generate_password_hash("123456"),
+                email="teste@example.com",
+                date_joined=getattr(__import__('datetime'), 'date').today()
+            )
+            DB.session.add(user)
+            DB.session.commit()
+
+    client.post("/login", data={
+        "username": "teste",
+        "password": "123456"
+    })
+
+    return client
 
 @pytest.fixture()
 def app():
@@ -21,29 +45,29 @@ def client(app):
     return app.test_client()
 
 
-def test_index(client):
-    response = client.get("/books")
+def test_index(authenticated_client):
+    response = authenticated_client.get("/books")
     assert response.status_code == 200
     assert "" !=  response.data
 
 
-def test_books_page_has_create_button(client):
-    response = client.get("/books")
+def test_books_page_has_create_button(authenticated_client):
+    response = authenticated_client.get("/books")
     assert response.status_code == 200
     assert b"Cadastrar livro" in response.data
     assert b'href="/create"' in response.data
 
 
-def test_create_page_renders(client):
-    response = client.get("/create")
+def test_create_page_renders(authenticated_client):
+    response = authenticated_client.get("/create")
     assert response.status_code == 200
     assert b"Cadastrar livro" in response.data
     assert b'action="/create"' in response.data
     assert b'method="post"' in response.data
 
 
-def test_create_book_redirects_to_books(client):
-    response = client.post("/create", data={
+def test_create_book_redirects_to_books(authenticated_client):
+    response = authenticated_client.post("/create", data={
         "title": "Test Book",
         "author": "Test Author",
         "issn": "1234567890",
@@ -54,9 +78,9 @@ def test_create_book_redirects_to_books(client):
     assert response.location == "/books"
 
 
-def test_books_page_has_delete_button(client):
+def test_books_page_has_delete_button(authenticated_client):
     # Create a book first
-    client.post("/create", data={
+    authenticated_client.post("/create", data={
         "title": "Test Book",
         "author": "Test Author",
         "issn": "1234567890",
@@ -65,15 +89,15 @@ def test_books_page_has_delete_button(client):
     }, follow_redirects=True)
 
     # Check that delete button exists
-    response = client.get("/books")
+    response = authenticated_client.get("/books")
     assert response.status_code == 200
     assert b"Deletar" in response.data
     assert b'/delete/' in response.data
 
 
-def test_delete_book_redirects_to_books(app, client):
+def test_delete_book_redirects_to_books(app, authenticated_client):
     # Create a book first
-    client.post("/create", data={
+    authenticated_client.post("/create", data={
         "title": "Test Book",
         "author": "Test Author",
         "issn": "1234567890",
@@ -87,7 +111,7 @@ def test_delete_book_redirects_to_books(app, client):
         book_id = book.id
 
     # Delete the book
-    response = client.post(f"/delete/{book_id}", follow_redirects=False)
+    response = authenticated_client.post(f"/delete/{book_id}", follow_redirects=False)
     assert response.status_code == 302
     assert response.location == "/books"
 

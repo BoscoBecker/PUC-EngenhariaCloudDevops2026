@@ -10,10 +10,11 @@ from Entities.book import Book
 
 from db import DB
 from werkzeug.security import check_password_hash, generate_password_hash
+import secrets
 
 PATH_DB = 'sqlite:///books.db'
 APP = Flask(__name__)
-APP.secret_key = '*_D41D8CD98F00B204E9800998ECF8427E_*'
+APP.secret_key = secrets.token_hex(32)
 APP.config['SQLALCHEMY_DATABASE_URI'] = PATH_DB
 APP.config['SQLALCHEMY_ECHO'] = True
 DB.init_app(APP)
