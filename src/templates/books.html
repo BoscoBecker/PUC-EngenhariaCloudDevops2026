@@ -31,7 +31,7 @@
     <div class="container py-5">
         <div class="row mb-4">
             <div class="col-12 col-md-8">
-                <h1 class="mb-0">Books</h1>
+                <h3 class="mb-0">Books</h3>
                 <p class="text-muted">Use a pesquisa e a paginação para localizar seus livros.</p>
             </div>
             <div class="col-12 col-md-4 text-md-end align-self-center">
@@ -102,15 +102,16 @@
         const searchInput = document.getElementById('searchInput');
         const pagination = document.getElementById('pagination');
         const tableInfo = document.getElementById('tableInfo');
-        const rows = Array.from(document.querySelectorAll('#booksTable tbody tr'));
+        const tbody = document.querySelector('#booksTable tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
         const pageSize = 5;
         let currentPage = 1;
         let filteredRows = rows.slice();
 
         function renderTable() {
+            const query = searchInput.value.trim().toLowerCase();
             filteredRows = rows.filter(row => {
                 const text = row.textContent.toLowerCase();
-                const query = searchInput.value.trim().toLowerCase();
                 return text.includes(query);
             });
 
@@ -120,22 +121,23 @@
             const startIndex = (currentPage - 1) * pageSize;
             const endIndex = startIndex + pageSize;
 
+            const existingNoResults = tbody.querySelector('tr.no-results');
+            if (existingNoResults) {
+                existingNoResults.remove();
+            }
+
             rows.forEach(row => row.style.display = 'none');
             filteredRows.slice(startIndex, endIndex).forEach(row => row.style.display = 'table-row');
 
             if (totalRows === 0) {
-                const tbody = document.querySelector('#booksTable tbody');
                 const noResultsRow = document.createElement('tr');
                 noResultsRow.classList.add('no-results');
-                noResultsRow.innerHTML = '<td colspan="6" class="text-center text-muted py-4">Nenhum livro encontrado.</td>';
+                noResultsRow.innerHTML = '<td colspan="7" class="text-center text-muted py-4">Nenhum livro encontrado.</td>';
                 tbody.appendChild(noResultsRow);
-            } else {
-                const existingNoResults = document.querySelector('#booksTable tbody tr.no-results');
-                if (existingNoResults) existingNoResults.remove();
             }
 
             renderPagination(totalPages);
-            updateInfo(totalRows, startIndex + 1, Math.min(endIndex, totalRows));
+            updateInfo(totalRows, totalRows === 0 ? 0 : startIndex + 1, Math.min(endIndex, totalRows));
         }
 
         function renderPagination(totalPages) {
