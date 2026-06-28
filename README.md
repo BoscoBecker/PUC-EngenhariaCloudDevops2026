@@ -1,6 +1,8 @@
 # PUC-EngenhariaCloudDevops2026
 Projeto da disciplina DevOps (Turma U) da Pós em Engenharia de Serviços e Cloud.
 
+![alt text](image.png)
+
 ## Descrição
 Este projeto apresenta um exemplo simples de aplicação web em Flask, com persistência de dados usando SQLAlchemy e testes automatizados com pytest.
 
@@ -38,3 +40,4 @@ Este projeto apresenta um exemplo simples de aplicação web em Flask, com persi
    ```bash
    pytest
    ```
+
